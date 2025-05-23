@@ -1,61 +1,58 @@
--- Roblox Lag Reducer (Local Script)
-for _, v in pairs(game.Lighting:GetChildren()) do
-    if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") then
+-- Roblox FPS Boost Script - Tắt đồ họa và hiệu ứng
+for _,v in pairs(game:GetDescendants()) do
+    if v:IsA("BasePart") then
+        v.Material = Enum.Material.SmoothPlastic
+        v.Reflectance = 0
+    elseif v:IsA("Decal") then
+        v.Transparency = 1
+    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
         v.Enabled = false
     end
 end
 
-game.Lighting.GlobalShadows = false
-game.Lighting.FogEnd = 100000
-game.Lighting.Brightness = 1
+-- Tắt bóng
+game:GetService("Lighting").GlobalShadows = false
+game:GetService("Lighting").FogEnd = math.huge
+game:GetService("Lighting").Brightness = 0
 
-local function optimize(part)
-    if part:IsA("BasePart") then
-        part.Material = Enum.Material.SmoothPlastic
-        part.Reflectance = 0
+-- Tắt hiệu ứng hậu cảnh
+for _,v in pairs(game:GetService("Lighting"):GetChildren()) do
+    if v:IsA("PostEffect") then
+        v.Enabled = false
     end
 end
 
-for _, obj in pairs(workspace:GetDescendants()) do
-    optimize(obj)
-end
+-- Giảm chất lượng render
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level01gg.clearResults()
+gg.setVisible(false)
 
-workspace.DescendantAdded:Connect(optimize) -- Tăng chất lượng ánh sáng và hiệu ứng
-local Lighting = game:GetService("Lighting")
+gg.toast("Đang xóa hiệu ứng...")
 
-Lighting.GlobalShadows = true
-Lighting.EnvironmentDiffuseScale = 1
-Lighting.EnvironmentSpecularScale = 1
-Lighting.Brightness = 3
-Lighting.ClockTime = 14
-Lighting.ExposureCompensation = 0.25
-Lighting.FogStart = 100
-Lighting.FogEnd = 1000
-Lighting.FogColor = Color3.fromRGB(200, 200, 200)
+-- Tắt hiệu ứng khói
+gg.searchNumber("1.0F;0.5F;0.0F:13", gg.TYPE_FLOAT)
+gg.getResults(100)
+gg.editAll("0", gg.TYPE_FLOAT)
 
--- Sử dụng hiệu ứng ánh sáng nâng cao nếu có Future Lighting
-if settings().Rendering.QualityLevel >= Enum.QualityLevel.Level10 then
-    Lighting.Technology = Enum.Technology.Future
-end local atmosphere = Instance.new("Atmosphere", Lighting)
-atmosphere.Density = 0.3
-atmosphere.Haze = 1
-atmosphere.Glare = 1
+-- Tắt hiệu ứng lửa
+gg.clearResults()
+gg.searchNumber("3.0F;2.5F;1.0F:17", gg.TYPE_FLOAT)
+gg.getResults(100)
+gg.editAll("0", gg.TYPE_FLOAT)
 
-local bloom = Instance.new("BloomEffect", Lighting)
-bloom.Intensity = 0.6
-bloom.Size = 24
+-- Tắt hiệu ứng đạn, nổ
+gg.clearResults()
+gg.searchNumber("90;180;270:13", gg.TYPE_DWORD)
+gg.getResults(100)
+gg.editAll("0", gg.TYPE_DWORD)
 
-local colorCorrection = Instance.new("ColorCorrectionEffect", Lighting)
-colorCorrection.TintColor = Color3.fromRGB(255, 240, 220)
-colorCorrection.Saturation = 0.1
-colorCorrection.Contrast = 0.05 -- Anti-ban cơ bản (ẩn GG và xóa dấu vết)
+-- Anti-ban cơ bản (ẩn GG và xóa dấu vết)
 gg.clearResults()
 gg.setRanges(gg.REGION_C_ALLOC)
 gg.searchNumber("com.dts.freefireth", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, 0, -1)
 gg.getResults(99999)
 gg.editAll("0", gg.TYPE_BYTE)
 
-gg.toast("Anti-ban đã kích hoạt!") -- Script tăng đồ họa kiểu RTX giả (LocalScript)
+gg.toast("Xóa hiệu ứng + Anti-ban đã kích hoạt!")-- Script tăng đồ họa kiểu RTX giả (LocalScript)
 
 local Lighting = game:GetService("Lighting")
 
@@ -97,88 +94,4 @@ sunRays.Spread = 1
 local blur = Instance.new("BlurEffect", Lighting)
 blur.Size = 1
 
-print("Shader RTX giả đã được kích hoạt.") -- Script giảm lag Roblox (LocalScript)
-
--- Giảm chất lượng đồ họa
-settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-
--- Vô hiệu hóa hiệu ứng không cần thiết
-local Lighting = game:GetService("Lighting")
-Lighting.GlobalShadows = false
-Lighting.FogEnd = 1000000
-Lighting.Brightness = 0
-
--- Tắt các hiệu ứng trong game nếu có thể
-for _, v in pairs(workspace:GetDescendants()) do
-    if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") then
-        v.Enabled = false
-    elseif v:IsA("Decal") then
-        v.Transparency = 1
-    end
-end
-
--- Tắt âm thanh nền
-for _, sound in pairs(workspace:GetDescendants()) do
-    if sound:IsA("Sound") then
-        sound.Volume = 0
-    end
-end
-
--- Tăng FPS nếu dùng FPS unlocker
--- (Chức năng này phụ thuộc phần mềm ngoài, script không thể tự xử lý)
-
-print("Đã áp dụng script giảm lag.") gg.clearResults()
-gg.setVisible(false)
-
-gg.toast("Đang xóa hiệu ứng...")
-
--- Tắt hiệu ứng khói
-gg.searchNumber("1.0F;0.5F;0.0F:13", gg.TYPE_FLOAT)
-gg.getResults(100)
-gg.editAll("0", gg.TYPE_FLOAT)
-
--- Tắt hiệu ứng lửa
-gg.clearResults()
-gg.searchNumber("3.0F;2.5F;1.0F:17", gg.TYPE_FLOAT)
-gg.getResults(100)
-gg.editAll("0", gg.TYPE_FLOAT)
-
--- Tắt hiệu ứng đạn, nổ
-gg.clearResults()
-gg.searchNumber("90;180;270:13", gg.TYPE_DWORD)
-gg.getResults(100)
-gg.editAll("0", gg.TYPE_DWORD)
-
--- Anti-ban cơ bản (ẩn GG và xóa dấu vết)
-gg.clearResults()
-gg.setRanges(gg.REGION_C_ALLOC)
-gg.searchNumber("com.dts.freefireth", gg.TYPE_BYTE, false, gg.SIGN_EQUAL, 0, -1)
-gg.getResults(99999)
-gg.editAll("0", gg.TYPE_BYTE)
-
-gg.toast("Xóa hiệu ứng + Anti-ban đã kích hoạt!") -- Roblox FPS Boost Script - Tắt đồ họa và hiệu ứng
-for _,v in pairs(game:GetDescendants()) do
-    if v:IsA("BasePart") then
-        v.Material = Enum.Material.SmoothPlastic
-        v.Reflectance = 0
-    elseif v:IsA("Decal") then
-        v.Transparency = 1
-    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-        v.Enabled = false
-    end
-end
-
--- Tắt bóng
-game:GetService("Lighting").GlobalShadows = false
-game:GetService("Lighting").FogEnd = math.huge
-game:GetService("Lighting").Brightness = 0
-
--- Tắt hiệu ứng hậu cảnh
-for _,v in pairs(game:GetService("Lighting"):GetChildren()) do
-    if v:IsA("PostEffect") then
-        v.Enabled = false
-    end
-end
-
--- Giảm chất lượng render
-settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+print("Shader RTX giả đã được kích hoạt.")  
