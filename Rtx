@@ -45,6 +45,9 @@ local function applyNight()
     print("RTX Night Mode (Strong Bloom) Applied.")
 end
 
+-- Lưu tham chiếu nút mobile
+local buttonRef
+
 -- Toggle Logic
 local isDay = true
 local function toggleMode()
@@ -60,6 +63,17 @@ local function toggleMode()
         applyDay()
     end
     isDay = not isDay
+
+    -- ✅ Đổi chữ nút khi bật/tắt
+    if buttonRef then
+        if isDay then
+            buttonRef.Text = "Toggle RTX"
+            buttonRef.TextSize = 16 -- medium nhỏ
+        else
+            buttonRef.Text = "R"
+            buttonRef.TextSize = 20 -- medium vừa
+        end
+    end
 end
 
 -- PC Keybind: L to toggle
@@ -69,10 +83,15 @@ UIS.InputBegan:Connect(function(input, gp)
     end
 end)
 
--- Mobile Touch Button
+-- Mobile Touch Button with drag support
 local function createMobileButton()
     local player = Players.LocalPlayer
     local playerGui = player:WaitForChild("PlayerGui")
+
+    -- Ngăn tạo trùng GUI nếu đã có
+    if playerGui:FindFirstChild("RTX_Toggle_UI") then
+        return
+    end
 
     local gui = Instance.new("ScreenGui")
     gui.Name = "RTX_Toggle_UI"
@@ -81,7 +100,7 @@ local function createMobileButton()
 
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(0, 140, 0, 40)
-    button.Position = UDim2.new(0.02, 0, 0.9, 0)
+    button.Position = UDim2.new(0.02, 0, 0.9, 0) -- Góc trái dưới màn hình
     button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     button.TextColor3 = Color3.new(1, 1, 1)
     button.Font = Enum.Font.GothamBold
@@ -89,7 +108,13 @@ local function createMobileButton()
     button.Text = "Toggle RTX"
     button.Parent = gui
 
+    button.Active = true
+    button.Draggable = true -- ✅ Cho phép kéo di chuyển nút
+
     button.MouseButton1Click:Connect(toggleMode)
+
+    -- ✅ Lưu tham chiếu nút
+    buttonRef = button
 end
 
 -- Start with Day Mode
